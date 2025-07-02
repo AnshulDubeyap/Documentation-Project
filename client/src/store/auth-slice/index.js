@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit"
 
 
 // Initial State
-const initalState = {
+const initialState = {
     user: null,
     isAuthenticated: false,
     isLoading: true
@@ -11,7 +11,7 @@ const initalState = {
 // Create a AuthSlice
 const authSlice = createSlice({
     name: "auth",
-    initalState,
+    initialState,
     reducers: {
         setUser: (state, action) => {
         }
