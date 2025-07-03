@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import AuthLayout from "./components/auth/layout.jsx";
 import AuthLogin from "./pages/auth/login.jsx";
 import AuthRegister from "./pages/auth/register.jsx";
@@ -13,30 +13,40 @@ import PrivateDocument from "./pages/privateView/privateDoc.jsx";
 import AdminLayout from "./components/adminView/layout.jsx";
 import AdminPanel from "./pages/adminView/adminPanel.jsx";
 import NotFound from "./pages/notFound/notFound.jsx";
+import CheckAuth from "./components/common/checkAuth.jsx";
 
 function App() {
+    const isAuthenticated = false;
+    const user = null;
     return (
         <div>
             {/* Auth Routes */}
             <Routes>
-                <Route path="/auth" element={<AuthLayout/>}>
+                <Route path="/auth" element={<CheckAuth isAuthenticated={isAuthenticated} user={user}><AuthLayout/>
+                </CheckAuth>}>
                     <Route path="login" element={<AuthLogin/>}/>
                     <Route path="register" element={<AuthRegister/>}/>
                 </Route>
-                <Route path="/editor" element={<EditorLayout/>}>
+                <Route path="/editor" element={<CheckAuth isAuthenticated={isAuthenticated} user={user}><EditorLayout/>
+                </CheckAuth>}>
                     <Route path="panel" element={<EditorPanel/>}/>
                 </Route>
-                <Route path="/" element={<PublicLayout/>}>
+                <Route path="/public" element={<CheckAuth isAuthenticated={isAuthenticated} user={user}><PublicLayout/>
+                </CheckAuth>}>
                     <Route path="listing" element={<PublicListing/>}/>
                     <Route path="document/:id" element={<PublicDocument/>}/>
                 </Route>
-                <Route path="/private" element={<PrivateLayout/>}>
+                <Route path="/private"
+                       element={<CheckAuth isAuthenticated={isAuthenticated} user={user}><PrivateLayout/>
+                       </CheckAuth>}>
                     <Route path="listing" element={<PrivateListing/>}/>
                     <Route path="document/:id" element={<PrivateDocument/>}/>
                 </Route>
-                <Route path="/admin" element={<AdminLayout/>}>
+                <Route path="/admin" element={<CheckAuth isAuthenticated={isAuthenticated} user={user}><AdminLayout/>
+                </CheckAuth>}>
                     <Route path="panel" element={<AdminPanel/>}/>
                 </Route>
+                <Route path="/" element={<Navigate to="/public/listing"/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
         </div>
