@@ -20,15 +20,7 @@ mongoose.connect("mongodb+srv://dubeyanshul2204:67kqkZWcI1BYB2J7@cluster0.xzgtcc
 // Configuring the cors
 app.use(
     cors({
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        allowedHeaders: [
-            "content-type",
-            "Authorization",
-            "Cache-control",
-            "Expires",
-            "Pragma",
-        ],
+        origin: ["http://localhost:5173"],
         credentials: true,
     })
 );

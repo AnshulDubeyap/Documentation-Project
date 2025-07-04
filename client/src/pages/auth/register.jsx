@@ -2,10 +2,21 @@ import React from 'react';
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import './register.css';
+import {useDispatch} from "react-redux";
+import {registerUser} from "../../store/auth-slice";
+import {useNavigate} from "react-router-dom";
+import {toast} from "sonner";
 
 const validRoles = ['user', 'editor']; // Only public roles
 
 const AuthRegister = () => {
+    // Dispatch
+    const dispatch = useDispatch();
+
+    // Navigate
+    const navigate = useNavigate();
+
+    // Initial Values
     const initialValues = {
         name: '',
         email: '',
@@ -13,6 +24,7 @@ const AuthRegister = () => {
         role: ''
     };
 
+    // Validation Schema
     const validationSchema = Yup.object({
         name: Yup.string().min(2, 'Too short').max(30, 'Too long').required('Required'),
         email: Yup.string().email('Invalid email format').required('Required'),
@@ -22,9 +34,40 @@ const AuthRegister = () => {
             .required('Role is required')
     });
 
+    // On Submit
     const onSubmit = (values, {setSubmitting}) => {
         console.log('Register data:', values);
-        setSubmitting(false);
+        dispatch(registerUser(values)) //! Dispatch the registerUser action with values
+            .then((data) => {
+                if (data?.payload?.success) {
+
+                    // Show success message
+                    toast("Success", {
+                        description: data?.payload?.message || "Registered successfully",
+                        variant: "success",
+                    });
+
+                    // Redirect to login
+                    navigate("/auth/login");
+
+                } else {
+                    // Show error message
+                    toast("Registration Failed", {
+                        description: data?.payload?.message || "Something went wrong",
+                        variant: "destructive",
+                    });
+                }
+            })
+            .catch((error) => {
+                toast("Error", {
+                    description: error?.response?.data?.message || "Something went wrong",
+                    variant: "destructive",
+                });
+                console.error("Registration failed:", error);
+            })
+            .finally(() => {
+                setSubmitting(false); //! Formik: Reset the submit button after request
+            });
     };
 
     return (

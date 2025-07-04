@@ -1,21 +1,31 @@
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import * as Yup from 'yup';
 import "./login.css";
+import {useDispatch} from "react-redux";
+import {useNavigate} from "react-router-dom";
 
 function AuthLogin() {
+
+    // Dispatch
+    const dispatch = useDispatch();
+
+    // Navigate
+    const navigate = useNavigate();
+
+    // Initial Values
     const initialValues = {
         email: '',
         password: ''
     };
-
+    // Validation Schema
     const validationSchema = Yup.object({
         email: Yup.string().email('Invalid email format').required('Required'),
         password: Yup.string().min(6, 'Minimum 6 characters').required('Required')
     });
-
+    // On Submit
     const onSubmit = (values, {setSubmitting}) => {
         console.log('Login data:', values);
-        setSubmitting(false);
+
     };
 
     return (

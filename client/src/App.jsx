@@ -14,13 +14,19 @@ import AdminLayout from "./components/adminView/layout.jsx";
 import AdminPanel from "./pages/adminView/adminPanel.jsx";
 import NotFound from "./pages/notFound/notFound.jsx";
 import CheckAuth from "./components/common/checkAuth.jsx";
+import {Toaster} from "sonner";
+import {useSelector} from "react-redux";
+
 
 function App() {
-    const isAuthenticated = false;
-    const user = null;
+    // Get user and auth state from redux store
+    const {isAuthenticated, user} = useSelector(state => state.auth);
+
+
     return (
         <div>
             {/* Auth Routes */}
+            <Toaster position="top-center" richColors/>
             <Routes>
                 <Route path="/auth" element={<CheckAuth isAuthenticated={isAuthenticated} user={user}><AuthLayout/>
                 </CheckAuth>}>
