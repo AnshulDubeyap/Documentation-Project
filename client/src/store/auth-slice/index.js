@@ -38,6 +38,28 @@ const loginUser = createAsyncThunk(
         return response.data;
     }
 )
+// Check Auth Reducers
+const checkAuth = createAsyncThunk(
+    "auth/checkAuth",
+    async () => {
+        const response = await axios.get("http://localhost:5000/api/auth/check-auth", {
+            withCredentials: true
+        });
+        return response.data;
+    }
+)
+
+// Logout Reducers
+const logoutUser = createAsyncThunk(
+    "auth/logout",
+    async () => {
+        const response = await axios.post("http://localhost:5000/api/auth/logout", {
+            withCredentials: true
+        });
+        return response.data;
+    }
+)
+
 
 // Create a AuthSlice
 const authSlice = createSlice({
@@ -67,6 +89,20 @@ const authSlice = createSlice({
             state.user = null;
         }).addCase(loginUser.pending, (state) => {
             state.isLoading = true;
+        }).addCase(checkAuth.pending, (state) => {
+            state.isLoading = true;
+        }).addCase(checkAuth.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.user = action.payload.user;
+            state.isAuthenticated = action.payload.success;
+        }).addCase(checkAuth.rejected, (state) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
+        }).addCase(logoutUser.fulfilled, (state) => {
+            state.isLoading = false;
+            state.user = null;
+            state.isAuthenticated = false;
         })
     }
 })
@@ -74,4 +110,4 @@ const authSlice = createSlice({
 // Export the Reducer and Actions
 export const {setUser} = authSlice.actions
 export default authSlice.reducer
-export {registerUser, loginUser};
+export {registerUser, loginUser, checkAuth, logoutUser};

@@ -15,12 +15,30 @@ import AdminPanel from "./pages/adminView/adminPanel.jsx";
 import NotFound from "./pages/notFound/notFound.jsx";
 import CheckAuth from "./components/common/checkAuth.jsx";
 import {Toaster} from "sonner";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {useEffect} from "react";
+import {checkAuth} from "./store/auth-slice";
+import {Skeleton} from "@/components/ui/skeleton";
 
 
 function App() {
+
+    // configure the checkAuth reducer
+    const dispatch = useDispatch();
+
+    // Dispatch the checkAuth action
+    useEffect(() => {
+        dispatch(checkAuth());
+    }, [dispatch]);
+
+
     // Get user and auth state from redux store
-    const {isAuthenticated, user} = useSelector(state => state.auth);
+    const {isAuthenticated, user, isLoading} = useSelector(state => state.auth);
+
+    // If loading, show loading spinner
+    if (isLoading) {
+        return <Skeleton className="h-[600px] w-[800px] bg-black"/>;
+    }
 
 
     return (
