@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 // Using the routes
-app.use("/api/auth", authRoute);
+app.use("/api/auth", authRoute)
 
 
 app.listen(PORT, () => {
