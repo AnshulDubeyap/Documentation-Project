@@ -5,12 +5,12 @@ const User = require("../../models/user");
 const RegisterUser = async (req, res) => {
     try {
         // Destructuring
-        const {name, email, password} = req.body;
+        const {name, email, password, role} = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({email});
         if (existingUser) {
-            return res.status(400).json({success: false, message: "User already exists"});
+            return res.status(200).json({success: false, message: "User already exists"});
         }
 
         // Hash password
@@ -22,10 +22,14 @@ const RegisterUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
+            role
         });
 
         // Save user
         await newUser.save();
+
+        // Log user
+        console.log("New user created:", newUser);
 
         // Send response
         res.status(201).json({success: true, message: "User created successfully"});
