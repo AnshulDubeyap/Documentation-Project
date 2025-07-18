@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import './register.css';
 import {useDispatch} from "react-redux";
 import {registerUser} from "../../store/auth-slice";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {toast} from "sonner";
 
 const validRoles = ['user', 'editor']; // Only public roles
@@ -110,6 +110,11 @@ const AuthRegister = () => {
                     </Form>
                 )}
             </Formik>
+
+            {/* Register Link */}
+            <div className="register-redirect">
+                Already have an account? <Link to="/auth/login" className="register-link">Login here</Link>
+            </div>
         </div>
     );
 };

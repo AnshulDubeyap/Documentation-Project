@@ -10,7 +10,6 @@ const {
 router.post("/register", RegisterUser);
 router.post("/login", LoginUser);
 router.post("/logout", LogoutUser);
-
 router.get("/check-auth", authMiddleware, (req, res) => {
     const user = req.user;
     res.status(200).json({

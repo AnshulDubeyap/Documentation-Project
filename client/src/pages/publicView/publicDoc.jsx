@@ -1,7 +1,7 @@
 function PublicDocument() {
     return (
-        <h1>this is the public document</h1>
-    )
+        <div>PublicDocument</div>
+    );
 }
 
 export default PublicDocument;
