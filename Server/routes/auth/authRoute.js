@@ -4,7 +4,7 @@ const {
     RegisterUser,
     LoginUser,
     LogoutUser,
-    authMiddleware
+    authMiddleware,
 } = require("../../controllers/auth/authController");
 
 router.post("/register", RegisterUser);
