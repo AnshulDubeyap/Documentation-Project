@@ -34,7 +34,7 @@ const userSlice = createSlice({
             })
             .addCase(fetchAllUsers.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.allUsers = action.payload?.users || []; // assuming response shape: { users: [...] }
+                state.allUsers = action.payload.data;
             })
             .addCase(fetchAllUsers.rejected, (state, action) => {
                 state.isLoading = false;

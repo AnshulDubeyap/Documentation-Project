@@ -3,8 +3,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+
 // Importing the routes
 const authRoute = require("./routes/auth/authRoute.js");
+const userRoute = require("./routes/user/userRoute.js");
+const docsRoute = require("./routes/docs/docsRoute.js");
 
 
 const app = express();
@@ -31,6 +34,8 @@ app.use(express.json());
 
 // Using the routes
 app.use("/api/auth", authRoute)
+app.use("/api/user", userRoute)
+app.use("/api/docs", docsRoute)
 
 
 app.listen(PORT, () => {
