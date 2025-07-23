@@ -1,19 +1,13 @@
 const Document = require("../../models/Document");
 
 const createDocument = async (req, res) => {
-
-    // Log the incoming request
     console.log("📥 Incoming Request Body:", req.body);
-
-    // Log the user from auth middleware
     console.log("📥 Incoming Request User:", req.user);
-
 
     try {
         const {title, content, visibility, tags} = req.body;
-        const userId = req.user.userId; // assuming auth middleware sets req.user
+        const userId = req.user.userId;
 
-        // Create a new document
         const newDoc = new Document({
             title,
             content,
@@ -22,10 +16,7 @@ const createDocument = async (req, res) => {
             tags: tags || []
         });
 
-        // Save the document
         const savedDoc = await newDoc.save();
-
-        // Return the saved document and a success message
         res.status(201).json({
             success: true,
             message: "Document created successfully",
@@ -37,19 +28,17 @@ const createDocument = async (req, res) => {
     }
 };
 
-// Fetch the all documents created by the author
-
 const getDocumentsByAuthor = async (req, res) => {
     try {
-
-        // Get the author ID from the request
         const authorId = req.user.userId;
         console.log("🔍 Incoming Request Author ID:", authorId);
 
-        // Find all documents created by the author
-        const documents = await Document.find({author: authorId});
+        const documents = await Document.find({author: authorId}).populate({
+            path: "author",
+            model: "User",
+            select: "name"
+        });
 
-        // Return the documents
         res.status(200).json({
             success: true,
             message: "Documents fetched successfully",
@@ -59,17 +48,17 @@ const getDocumentsByAuthor = async (req, res) => {
         console.error(error);
         res.status(500).json({success: false, message: "Internal Server Error"});
     }
-}
-
-// Fetch the all documents that are public
+};
 
 const getPublicDocuments = async (req, res) => {
     try {
-        // Find all public documents
-        const documents = await Document.find({visibility: "public"});
-        console.log("🌍 Incoming Request Public Documents:", documents);
+        const documents = await Document.find({visibility: "public"}).populate({
+            path: "author",
+            model: "User",
+            select: "name"
+        });
 
-        // Return the documents
+        console.log("🌍 Public Documents Found:", documents);
         res.status(200).json({
             success: true,
             message: "Public documents fetched successfully",
@@ -79,23 +68,13 @@ const getPublicDocuments = async (req, res) => {
         console.error(error);
         res.status(500).json({success: false, message: "Internal Server Error"});
     }
-}
-
-// Fetch the all documents that are private but with specific tags included
+};
 
 const getPrivateDocumentsWithTags = async (req, res) => {
     try {
-        // Get the current user's ID from the auth middleware
         const userId = req.user.userId;
         console.log("🔐 Fetching private documents for tagged user:", userId);
-
-        // Find all private documents where the current user is tagged
-        const documents = await Document.find({
-            visibility: "private",
-            tags: userId
-        });
-
-        // Return the documents
+        const documents = await Document.find({visibility: "private", tags: userId});
         res.status(200).json({
             success: true,
             message: "Private tagged documents fetched successfully",
@@ -107,57 +86,96 @@ const getPrivateDocumentsWithTags = async (req, res) => {
     }
 };
 
-
-// Author can update a document
-
 const updateDocument = async (req, res) => {
-    // get the document id we want to update
     const {id} = req.params;
-    console.log("🔄 Incoming Update Request ID:", id);
-
-
-    // get the new data
     const {title, content, visibility, tags} = req.body;
-    console.log("🔄 Incoming Update Data:", req.body);
+    const userId = req.user.userId;
 
-    // update the document
-    const updatedDocument = await Document.findByIdAndUpdate(id, {
-        title,
-        content,
-        visibility,
-        tags
-    }, {new: true});
+    const document = await Document.findById(id);
+    if (!document) {
+        return res.status(404).json({success: false, message: "Document not found"});
+    }
 
-    // save the updated document
-    await updatedDocument.save();
+    if (document.author.toString() !== userId) {
+        return res.status(403).json({success: false, message: "Unauthorized"});
+    }
 
-    // return the updated document
+    document.title = title;
+    document.content = content;
+    document.visibility = visibility;
+    document.tags = tags;
+    const updatedDocument = await document.save();
+
     res.status(200).json({
         success: true,
         message: "Document updated successfully",
         data: updatedDocument
     });
-}
+};
 
+//Get a single document that is public
 
-// Author can delete a document
+const getSinglePublicDocument = async (req, res) => {
+    try {
+        const {id} = req.params;
+        console.log("📥 Incoming request for public document with ID:", id);
+
+        // Find the document with visibility public
+        const doc = await Document.findOne({_id: id, visibility: "public"}).populate({
+            path: "author",
+            model: "User",
+            select: "name"
+        });
+
+        if (!doc) {
+            console.log("⚠️ Document not found or not public for ID:", id);
+            return res.status(404).json({
+                success: false,
+                message: "Document not found or not public"
+            });
+        }
+
+        console.log("✅ Public document found:", {
+            id: doc._id,
+            title: doc.title,
+            author: doc.author?.name,
+            visibility: doc.visibility
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Public document fetched successfully",
+            data: doc
+        });
+    } catch (error) {
+        console.error("❌ Error in getSinglePublicDocument:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
+
 
 const deleteDocument = async (req, res) => {
-    // get the document id we want to delete
     const {id} = req.params;
-    console.log("🗑️ Incoming Delete Request ID:", id);
+    const userId = req.user.userId;
 
-    // delete the document
-    const deletedDocument = await Document.findByIdAndDelete(id);
+    const document = await Document.findById(id);
+    if (!document) {
+        return res.status(404).json({success: false, message: "Document not found"});
+    }
 
-    // return the deleted document
+    if (document.author.toString() !== userId) {
+        return res.status(403).json({success: false, message: "Unauthorized"});
+    }
+
+    await document.deleteOne();
     res.status(200).json({
         success: true,
-        message: "Document deleted successfully",
-        data: deletedDocument
+        message: "Document deleted successfully"
     });
-
-}
+};
 
 module.exports = {
     createDocument,
@@ -165,5 +183,6 @@ module.exports = {
     updateDocument,
     deleteDocument,
     getPublicDocuments,
-    getPrivateDocumentsWithTags
-}
+    getPrivateDocumentsWithTags,
+    getSinglePublicDocument
+};

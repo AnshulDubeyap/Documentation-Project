@@ -9,10 +9,17 @@ import {useDispatch, useSelector} from "react-redux";
 import {fetchAllUsers} from "../../store/user-slice";
 import {createDocument} from "../../store/docs-slice";
 import {toast} from "sonner";
+import AuthorDocument from "../../components/editorView/editorDocument.jsx";
+import axios from "axios";
 
 function EditorPanel() {
+    // State for sheet
     const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
+
+    // State for edit document
+    const [selectedDocument, setSelectedDocument] = useState(null);
+
 
     useEffect(() => {
         dispatch(fetchAllUsers());
@@ -28,24 +35,29 @@ function EditorPanel() {
 
     return (
         <div className="editor-panel">
-            <Sheet open={open} onOpenChange={setOpen}>
+            <Sheet open={open} onOpenChange={(val) => {
+                setOpen(val);
+                if (!val) setSelectedDocument(null); // Clear form state when sheet is closed
+            }}>
                 <SheetTrigger asChild>
                     <Button className="create-button" onClick={() => setOpen(true)}>
                         <FileText/>
-                        <span className="create-text">Create Document</span>
+                        <span
+                            className="create-text">Create a new document</span>
                     </Button>
                 </SheetTrigger>
 
                 <SheetContent side="right">
                     <div className="form-container">
-                        <p className="form-title">Create a new document</p>
+                        <p className="form-title"> {selectedDocument ? "Edit Document" : "Create a New Document"}</p>
 
                         <Formik
+                            enableReinitialize
                             initialValues={{
-                                title: "",
-                                content: "",
-                                visibility: "private",
-                                tags: [],
+                                title: selectedDocument?.title || "",
+                                content: selectedDocument?.content || "",
+                                visibility: selectedDocument?.visibility || "private",
+                                tags: selectedDocument?.tags || [],
                                 author: user?._id || ""
                             }}
                             validationSchema={Yup.object({
@@ -54,25 +66,32 @@ function EditorPanel() {
                                 visibility: Yup.string().required("Visibility is required"),
                                 tags: Yup.array()
                             })}
-                            onSubmit={(values, {resetForm}) => {
-                                console.log(values, "values");
+                            onSubmit={async (values, {resetForm}) => {
+                                try {
+                                    if (selectedDocument) {
+                                        // Edit flow
+                                        const res = await axios.put(
+                                            `http://localhost:5000/api/docs/update/${selectedDocument._id}`,
+                                            values,
+                                            {withCredentials: true}
+                                        );
 
-                                dispatch(createDocument(values))
-                                    .then((res) => {
-                                        toast("Success", {
-                                            description: res?.payload?.message || "Document created successfully",
-                                            variant: "success",
-                                        });
-                                        resetForm();
-                                        setOpen(false);
-                                    })
-                                    .catch((error) => {
-                                        toast("Failed", {
-                                            description: error?.message || "Something went wrong",
-                                            variant: "destructive",
-                                        });
-                                        console.error("Error creating document:", error);
+                                        toast("Document updated successfully", {variant: "success"});
+                                    } else {
+                                        // Create flow
+                                        const res = await dispatch(createDocument(values));
+                                        toast("Document created successfully", {variant: "success"});
+                                    }
+
+                                    resetForm();
+                                    setSelectedDocument(null);
+                                    setOpen(false);
+                                } catch (error) {
+                                    toast("Failed", {
+                                        description: error?.message || "Something went wrong",
+                                        variant: "destructive",
                                     });
+                                }
                             }}
                         >
                             {({values, setFieldValue}) => {
@@ -146,7 +165,8 @@ function EditorPanel() {
                                             </>
                                         )}
 
-                                        <Button className="submit-button" type="submit">Create</Button>
+                                        <Button className="submit-button"
+                                                type="submit">{selectedDocument ? "Update" : "Create"}</Button>
                                     </Form>
                                 );
                             }}
@@ -154,7 +174,9 @@ function EditorPanel() {
                     </div>
                 </SheetContent>
             </Sheet>
+            <AuthorDocument setSelectedDocument={setSelectedDocument} setOpen={setOpen}/>
         </div>
+
     );
 }
 
