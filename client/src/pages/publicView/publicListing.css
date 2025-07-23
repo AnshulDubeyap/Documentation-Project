@@ -1,0 +1,155 @@
+/* src/components/publicView/publicListing.css */
+.public-docs-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.document-flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.public-doc-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    width: 28%; /* Fits 3 cards per row with gaps */
+}
+
+.public-doc-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.doc-header {
+    margin-bottom: 10px;
+}
+
+.doc-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0 0 5px;
+    word-wrap: break-word;
+}
+
+.doc-meta {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin: 5px 0;
+    word-wrap: break-word;
+}
+
+.doc-body {
+    margin-bottom: 10px;
+}
+
+.doc-preview {
+    font-size: 14px;
+    color: #34495e;
+    line-height: 1.5;
+    margin: 5px 0;
+    word-wrap: break-word;
+}
+
+.doc-footer {
+    text-align: right;
+}
+
+.read-more-btn {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.no-docs {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    /* Tablet and below */
+    .public-docs-container {
+        padding: 15px;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    .public-doc-card {
+        width: 45%; /* Two cards per row */
+        padding: 10px;
+    }
+
+    .doc-title {
+        font-size: 16px;
+    }
+
+    .doc-meta {
+        font-size: 12px;
+    }
+
+    .doc-preview {
+        font-size: 12px;
+    }
+
+    .read-more-btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Mobile */
+    .public-docs-container {
+        padding: 10px;
+    }
+
+    .page-title {
+        font-size: 18px;
+    }
+
+    .document-flex {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .public-doc-card {
+        width: 100%; /* Full width on mobile */
+        padding: 8px;
+    }
+
+    .doc-title {
+        font-size: 14px;
+    }
+
+    .doc-meta {
+        font-size: 10px;
+    }
+
+    .doc-preview {
+        font-size: 10px;
+    }
+
+    .read-more-btn {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+}
