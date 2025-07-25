@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import axios from "axios";
 
-// AsyncThunk to create a new document
+// Create Document
 export const createDocument = createAsyncThunk(
     "docs/createDocument",
     async (values) => {
@@ -12,7 +12,7 @@ export const createDocument = createAsyncThunk(
     }
 );
 
-// AsyncThunk to fetch all documents that are made by author
+// Fetch All Documents by Author (includes private and public)
 export const fetchDocumentsByAuthor = createAsyncThunk(
     "docs/fetchDocumentsByAuthor",
     async () => {
@@ -23,7 +23,7 @@ export const fetchDocumentsByAuthor = createAsyncThunk(
     }
 );
 
-// Delete Document
+// Delete a Document
 export const deleteDocument = createAsyncThunk(
     "docs/deleteDocument",
     async (id) => {
@@ -34,7 +34,7 @@ export const deleteDocument = createAsyncThunk(
     }
 );
 
-// Fetch Documents that are public
+// Fetch Public Documents
 export const fetchPublicDocuments = createAsyncThunk(
     "docs/fetchPublicDocuments",
     async () => {
@@ -45,19 +45,32 @@ export const fetchPublicDocuments = createAsyncThunk(
     }
 );
 
-// Create a docsSlice
+
+// Fetch Private Documents
+export const fetchPrivateDocuments = createAsyncThunk(
+    "docs/fetchPrivateDocuments",
+    async () => {
+        const response = await axios.get("http://localhost:5000/api/docs/getprivate", {
+            withCredentials: true,
+        });
+        return response.data;
+    }
+);
+
+// Slice
 const docsSlice = createSlice({
     name: "docs",
     initialState: {
         documents: [],
         publicDocuments: [],
-        isLoading: false, // Standardized loading state
+        privateDocuments: [],
+        isLoading: false,
         error: null,
     },
     reducers: {},
     extraReducers: (builder) => {
-        // Fetch Documents by Author
         builder
+            // Fetch Documents by Author
             .addCase(fetchDocumentsByAuthor.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -70,6 +83,7 @@ const docsSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.error.message || "Failed to fetch documents";
             })
+
             // Create Document
             .addCase(createDocument.pending, (state) => {
                 state.isLoading = true;
@@ -83,23 +97,40 @@ const docsSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.error.message || "Failed to create document";
             })
+
             // Delete Document
             .addCase(deleteDocument.fulfilled, (state, action) => {
                 state.documents = state.documents.filter(doc => doc._id !== action.payload);
             })
+
             // Fetch Public Documents
             .addCase(fetchPublicDocuments.pending, (state) => {
-                state.isLoading = true; // Changed from loading to isLoading
+                state.isLoading = true;
                 state.error = null;
             })
             .addCase(fetchPublicDocuments.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.publicDocuments = action.payload.data || []; // Match backend response
+                state.publicDocuments = action.payload.data || [];
             })
             .addCase(fetchPublicDocuments.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.error.message;
-            });
+                state.error = action.error.message || "Failed to fetch public documents";
+            })
+
+            // Fetch Private Documents
+            .addCase(fetchPrivateDocuments.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchPrivateDocuments.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.privateDocuments = action.payload.data || [];
+            })
+            .addCase(fetchPrivateDocuments.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.error.message || "Failed to fetch private documents";
+            })
+
     },
 });
 

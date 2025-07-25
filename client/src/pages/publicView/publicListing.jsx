@@ -1,19 +1,17 @@
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect} from "react";
-import {fetchPublicDocuments} from "../../store/docs-slice"; // Adjust path
-import {Button} from "../../components/ui/button"; // Adjust path
-import "./publicListing.css"; // Correct CSS file
+import {fetchPublicDocuments} from "../../store/docs-slice";
+import {Button} from "../../components/ui/button";
+import "./publicListing.css";
 
 function PublicListing() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Get public docs from Redux store
     const documents = useSelector((state) => state.docs.publicDocuments || []);
-    console.log("🌍 Public docs:", documents); // Log the fetched public documents
+    console.log("🌍 Public docs:", documents);
 
-    // Fetch public docs on mount
     useEffect(() => {
         console.log("🌍 Fetching public documents...");
         dispatch(fetchPublicDocuments());
@@ -30,9 +28,23 @@ function PublicListing() {
                             <div className="doc-header">
                                 <h3 className="doc-title">{doc.title}</h3>
                                 <p className="doc-meta">Author: {doc.author?.name || "Unknown Author"}</p>
-                                <p className="doc-meta">Created: {new Date(doc.createdAt).toLocaleString()}</p>
+                                <p className="doc-meta">Created: {new Date(doc.createdAt).toLocaleDateString("en-US", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                })}</p>
+                                {doc.updatedAt !== doc.createdAt && (
+                                    <p className="doc-meta">
+                                        Last Updated: {new Date(doc.updatedAt).toLocaleDateString("en-US", {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric",
+                                    })}
+                                    </p>
+                                )}
                                 <p className="doc-meta">Visibility: {doc.visibility}</p>
                             </div>
+
                             <div className="doc-body">
                                 <p className="doc-preview">
                                     {doc.content && doc.content.length > 120
@@ -40,11 +52,14 @@ function PublicListing() {
                                         : doc.content || "No content available"}
                                 </p>
                             </div>
+
                             <div className="doc-footer">
                                 <Button
                                     variant="outline"
                                     className="read-more-btn"
-                                    onClick={() => navigate(`/public/document/${doc._id}`)}
+                                    onClick={() =>
+                                        navigate(`/public/document/${doc._id}`)
+                                    }
                                 >
                                     Read More...
                                 </Button>

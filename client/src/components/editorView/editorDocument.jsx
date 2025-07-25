@@ -36,8 +36,18 @@ function AuthorDocument({setSelectedDocument, setOpen}) {
                             <div>
                                 <span className="doc-title">{doc.title}</span>
                                 <span className="doc-meta">Author: {doc.author?.name || "Unknown Author"}</span>
-                                <span className="doc-meta">Created: {new Date(doc.createdAt).toLocaleString()}</span>
-                                <span className="doc-meta">Updated: {new Date(doc.updatedAt).toLocaleString()}</span>
+                                <span
+                                    className="doc-meta">Created: {new Date(doc.createdAt).toLocaleDateString("en-US", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                })}</span>
+                                <span
+                                    className="doc-meta">Updated: {new Date(doc.updatedAt).toLocaleDateString("en-US", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                })}</span>
                                 <span className="doc-meta">Visibility: {doc.visibility}</span>
                             </div>
                             <div className="document-actions">

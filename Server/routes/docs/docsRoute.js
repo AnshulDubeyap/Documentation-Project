@@ -12,8 +12,9 @@ const {
     deleteDocument,
     getDocumentsByAuthor,
     getPublicDocuments,
-    getPrivateDocumentsWithTags,
-    getSinglePublicDocument
+    getSinglePublicDocument,
+    getPrivateDocuments,
+    getSinglePrivateDocument
 } = require("../../controllers/docs/docsController");
 
 router.post("/create", authMiddleware, createDocument);
@@ -21,8 +22,9 @@ router.put("/update/:id", authMiddleware, updateDocument);
 router.delete("/delete/:id", authMiddleware, deleteDocument);
 router.get("/getall/author", authMiddleware, getDocumentsByAuthor);
 router.get("/getpublic", getPublicDocuments);
-router.get("/getprivate", authMiddleware, getPrivateDocumentsWithTags);
 router.get("/getpublic/:id", getSinglePublicDocument);
+router.get("/getprivate", authMiddleware, getPrivateDocuments);
+router.get("/getprivate/:id", authMiddleware, getSinglePrivateDocument);
 
 
 module.exports = router;
